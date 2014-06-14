@@ -2,18 +2,84 @@
 
 
 ## Loading and preprocessing the data
+Input data is a ZIP file containing a single CSV file.
+First uncompress that file into a temporary directory "tmp"
 
+```{r unzip, echo=TRUE}
+unzip(zipfile="activity.zip", overwrite=TRUE, exdir="tmp")
+```
 
+Then read the data into the *inputdata* variable
+
+```{r inputdata, echo=TRUE}
+inputdata <- read.csv("tmp/activity.csv", head = TRUE)
+```
 
 ## What is mean total number of steps taken per day?
+First number of steps by day is calculated:
 
+```{r stepsbyday, echo=TRUE}
+stepsbyday <- aggregate( steps~date, inputdata, sum)
+```
 
+```{r histstepsbyday, echo=FALSE}
+hist(stepsbyday$steps, main = "Histogram of total steps by day", xlab="Steps by day")
+```
+
+Then mean and median of the step array:
+
+```{r meanstepsbyday, echo=TRUE}
+mean(stepsbyday$steps)
+median(stepsbyday$steps)
+```
 
 ## What is the average daily activity pattern?
+```{r meandailyactivity, echo=TRUE}
+meandailyactivity <- aggregate( steps~interval, inputdata, mean)
 
+plot(x=meandailyactivity, type='l')
+```
 
 
 ## Imputing missing values
+1. Total number of missing values in the dataset
+```{r total missing values, echo=TRUE}
+numberofmissingvalues <- nrow(inputdata[is.na(inputdata$steps),])
+numberofmissingvalues
+```
+
+2. Strategy for filled-in missing number of steps.
+Any row with NA number of steps will be replaced with the mean of
+the corresponding 5-minute interval.
+
+3. New dataset based on (2)
+
+```{r fill-in missing values, echo=TRUE}
+for (i in seq(nrow(inputdata))) {
+    if (is.na(inputdata[i,"steps"])) {
+        interval <- inputdata[i,"interval"]
+        inputdata[i,"steps"] <-
+          meandailyactivity[meandailyactivity$interval == interval, "steps"]
+    }
+}
+```
+4. Histogram of total number of steps each day, then mean and median for this
+
+```{r newstepsbyday, echo=TRUE}
+stepsbyday <- aggregate( steps~date, inputdata, sum)
+```
+
+```{r newhiststepsbyday, echo=FALSE}
+hist(stepsbyday$steps, main = "Histogram of total steps by day", xlab="Steps by day")
+```
+
+Then mean and median of the new step array.
+Note that mean shall not be affected but median might have changed
+with this strategy:
+
+```{r newmeanstepsbyday, echo=TRUE}
+mean(stepsbyday$steps)
+median(stepsbyday$steps)
 
 
 
