@@ -89,7 +89,16 @@ First add column with weekday for every row
 ```{r weekday, echo=TRUE}
 inputdata$WeekEnd <- as.factor(ifelse(as.POSIXlt(inputdata$date)$wday %in% c(0,6),
                    "weekend", "weekday"))
+```
 
 
+
+Then aggregate by factor and plot
+```{r aggregateandplotweekday, echo=TRUE}
+aggregated <- aggregate(inputdata$steps, list(interval = inputdata$interval, WeekEnd = inputdata$WeekEnd), mean)
+
+colnames(aggregated)[3] <- "steps"
+
+coplot(steps ~ interval | WeekEnd, data=aggregated, type='l')
 ```
 
