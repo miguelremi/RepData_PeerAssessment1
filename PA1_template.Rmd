@@ -80,7 +80,16 @@ with this strategy:
 ```{r newmeanstepsbyday, echo=TRUE}
 mean(stepsbyday$steps)
 median(stepsbyday$steps)
-
+```
 
 
 ## Are there differences in activity patterns between weekdays and weekends?
+First add column with weekday for every row
+
+```{r weekday, echo=TRUE}
+inputdata$WeekEnd <- as.factor(ifelse(as.POSIXlt(inputdata$date)$wday %in% c(0,6),
+                   "weekend", "weekday"))
+
+
+```
+
